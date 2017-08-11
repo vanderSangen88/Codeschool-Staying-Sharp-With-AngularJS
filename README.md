@@ -188,3 +188,8 @@ angular.module('NoteWrangler')
 <p ng-if="createController.errors"> {{ createController.errors }} </p>
 ```
 ---
+
+### 2.1 $scope
+
+### 2.2 Scope-a-dope
+When using the ```controllerAs``` syntax, the controller's context (```this```) attaches things to the current ```scope```behind the scenes. **TRUE**
