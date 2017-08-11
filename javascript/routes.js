@@ -3,7 +3,7 @@ angular.module('NoteWrangler')
     $routeProvider.when('/notes', {
         templateUrl: '/templates/pages/notes/index.html',
         controller: 'NotesIndexController',
-        controllerAs: 'indexController'
+        controllerAs: 'notes'
     })
     .when('/notes/:id', {
         templateUrl: '/templates/pages/notes/show.html',
