@@ -191,5 +191,114 @@ angular.module('NoteWrangler')
 
 ### 2.1 $scope
 
-### 2.2 Scope-a-dope
+### 2.2 Scope-a-dope - QUIZ
 When using the ```controllerAs``` syntax, the controller's context (```this```) attaches things to the current ```scope```behind the scenes. **TRUE**
+
+### 2.5 Scope the Config object
+
+#### Isolating the Scope:
+Give the directive object a property called scope and set it to an empty object.  
+*in nw-card.js*
+```js
+...
+  scope: {},
+...
+```
+#### Passing Header Into the directive:
+Isolating the scope breaks the access to the parent' scope. Therefor
+1. set the note instance to a header variable and
+2. print it out in the template.  
+*in notes.html*
+```html
+<nw-card header="{{note.title}}"></nw-card> <!-- 1. -->
+```
+*in nw-card.html*
+```html
+<h2 class="h3">{{header}}</h2> <!-- 2. -->
+```
+
+#### A Way to Pass In a Header:
+To tell the directive it might receive a header variable and to bind it to the scope, some configuration is needed.
+1. Inside the scope set ```header``` to the ```"@"``` character. This tells the directive it passes in a string.  
+*in nw-card.js*
+```js
+...
+  scope: {
+    header: "@" // @ passes in a string
+  }
+...
+```
+There are 3 options when binding data to an isolate scope: @, =, and & characters.
+- ```"@"``` passes in a string.
+- ```"="``` two-way binds an object.
+- ```"&"``` ??
+
+#### Add Multiple Bindings:
+To display more then just the header, pass in as many bindings as you need to that object.  
+*in nw-card.js*
+```js
+...
+  scope {
+    header: "=",
+    icon: "="
+  }
+...
+```
+
+#### Difference Between $scope and Scope Object:
+The Scope Object is used to isolate a directive' scope. Whereas the $scope in the controller is used to set values or functions on the scope.
+
+### 2.6 Default Scope - QUIZ
+By default, directives use their parent's scope. **TRUE**
+
+### 2.7 Setting on Scope - QUIZ
+When setting ```$scope.title``` inside a directive using the default scope, we are actually setting a variable named title on the parent $scope. **TRUE**
+
+### 2.10 Link
+Objective: Click on each note to display the note's description.
+
+The link function is run after the directive has been compiled and linked up.  
+*in nw-card.js*
+```js
+...
+  return {
+      link: function(){
+        $("div.card").on("click", function(){
+          $("div.card p").toggleClass("hidden");
+        });
+      }
+  }
+...
+```
+But this still searches the entire DOM... Luckely ```link``` has an element parameter.
+The first parameter is scope, the second is the element. The element refers to the outermost element of the included template, which in our case is the div with the class card.  
+*in nw-card.js*
+```js
+...
+  return {
+    link: function(scope, element){
+        element.on("click", function(){
+          element("div.card p").toggleClass("hidden"); // No longer searches the entire DOM
+        });
+    }
+  }
+...
+```
+Link has an additional ```attrs``` parameter which allows access any of the attributes that are set on the directives element.  
+*in nw-card.js*
+```js
+  ...
+    link: function(scope, element, attrs){
+      ...
+      console.log(attrs.header);
+    }
+  ...
+```
+
+**The link function is the *PERFECT* place to do DOM-manipulation and any logic-functionality in the directive.**
+
+#### Strict Contextual Escaping service:
+It tells AngularJS "I trust this as HTML; Don't worry about escaping HTML that could be potentially unsafe".
+
+### 2.11 DOM Manipulation - QUIZ
+**Inside a directive's ```link``` function** is the proper place to access the HTML element within a directive.
