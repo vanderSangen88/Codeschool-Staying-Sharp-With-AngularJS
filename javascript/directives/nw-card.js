@@ -8,7 +8,9 @@ angular.module("NoteWrangler")
         templateUrl: "templates/directives/nw-card.html",
         scope: {
             header: "=",
-            description: "="
+            description: "=",
+            id: "=",
+            image: "="
         },
         link: function(scope, element, attrs){
             element.on("click", function(){

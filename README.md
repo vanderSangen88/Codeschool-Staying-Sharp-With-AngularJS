@@ -302,3 +302,142 @@ It tells AngularJS "I trust this as HTML; Don't worry about escaping HTML that c
 
 ### 2.11 DOM Manipulation - QUIZ
 **Inside a directive's ```link``` function** is the proper place to access the HTML element within a directive.
+
+---
+## Services Level 3 - 5 Recipes and a Factory
+
+### 3.1 A Service for Our Data Calls
+Services are responsible for connecting and getting data, and then sharing it across our application.
+
+There are 5 total recipes that range in complexity and customization.
+1. Value; used often. The simplest service recipe used for sharing a value that is used throughout your app repeatedly.
+2. Factory; most commonly used. Shares methods and objects.
+3. Service; rarely used. Shares instances of methods and objects.
+4. Provider; commonly used. Shares methods and objects (like a Factory), but allows for configuration.
+5. Constant; used less often. Shares a value witin application configuration.
+
+Factory and Provider are the two most commonly used for creating a Service.
+
+#### Creating a Service With the Factory Recipes
+Use the Factory recipe to register the service with our app module.  
+*in note.js*
+```js
+angular.module("NoteWrangler") // <ModuleName>
+.factory("Note", [function NoteFactory(){ // <ServiceName> <ServiceName>Factory
+  ...  
+}]);
+```
+
+#### Injecting Factory Service
+1. To use the factory, inject it into the function
+2. then call it  
+
+*in notes-index-controller.js*
+```js
+angular.module("NoteWrangler")
+.controller("NotesIndexControlller", function($scope, Note){
+  Note.all()
+  .success(function(data){
+    $scope.notes = data;
+  });
+});
+```
+
+### 3.4 A Service for an Outside API
+
+#### Providing Our App With Gravatar Images
+In order to access someone's Gravatar, we need to hash their email address and append it to a URL.
+1. Hash user's email address into a hash. (test@test.nl => bf4ee76b5f3a6bfed26bca5460bc3f22)
+2. Add this hash onto a Gravatar URL (http://www.gravatar.com/avatar/bf4ee...png)
+3. Use this URL in a template with an ```ng-src``` attribute.
+
+*in index.html*
+```html
+<!-- Include lib for hashing -->
+<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/md5.js"></script>
+```
+*in gravatar.js*
+```js
+// Create new Factory called Gravatar
+angular.module("NoteWrangler")
+.factory("Gravatar", function GravatarFactory(){
+    var avatarSize = 80; // Default size
+    var avatarUrl = "http://www.gravatar.com/avatar/";
+    return function(email){
+        return avatarUrl // 2.
+        + CryptoJS.MD5(email) // 1.
+        + "?size=" + avatarSize.toString();
+    };
+});
+```
+*in users-index-controller.js*
+```js
+angular.module("NoteWrangler")
+.controller("UsersIndexController", function($scope, Gravatar){
+    $scope.gravatarUrl = function(email){
+        return Gravatar(email);
+    }
+});
+```
+*in users/index.html*
+```html
+<nw-card ... image="gravatarUrl(user.email)"></nw-card>
+```
+*in nw-card.html*
+```html
+...
+<img ng-src="{{image}}" ng-if="image" /> <!-- 3. -->
+...
+```
+
+### 3.7 Providers
+
+#### Current Gravatar Factory
+Use a provider recipe instead to make the ```avatarSize``` configurable.
+
+Providers run before everything else, so the only thing you can inject into them is other providers.
+
+**When defining a factory recipe, an empty Provider with the $get method set to your factory function is automatically created under the hood.**
+
+To convert the factory in a provider:
+1. Change ```.factory``` to ```.provider```.
+2. Wrap the ```return``` with an anonymous function and set it equal to this.$get.
+
+To make it configurable:
+1. Create a function in the provider.
+2. Add configuration to the main module.
+3. Pass in the configurable setting.
+
+### 3.10 $resource
+
+#### Installing Angular resource
+The ngResource module is not included with the AngularJS core by default - We need to download it from code.angularjs.org and include it here: js/vendor/angular-resource.js.  
+*in index.html*
+```html
+<script src="js/vendor/angular-resource.js"></script>
+```
+
+#### Including ngResource in Our App module
+*in app.js*
+```js
+angular.module("NoteWrangler", ['ngRoute', 'ngResource'])
+
+```
+
+#### $resource shortened our code
+To get a single resource ```Note.get({id: $routeParams.id})```.  
+To get all resources ```Note.query()```.  
+To delete resources ```Note.$delete()```.  
+To create a new resource ```$scope.note = new Note(); note.$save()```.
+
+#### Creating Custom $resource Methods
+*in note.js*
+```js
+...
+  return $resource('/notes/:id', {}, {
+    update: {
+      method: "PUT"
+    }
+  });
+...
+```

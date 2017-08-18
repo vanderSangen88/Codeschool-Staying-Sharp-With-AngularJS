@@ -1,7 +1,14 @@
 angular.module('NoteWrangler')
-.controller('NotesIndexController', ['$http', '$scope', function($http, $scope){
-    $http({method: 'GET', url: '/notes'})
-    .success(function(data){
-        $scope.notes = data;
-    });
-});
+.controller('NotesIndexController', ['$scope', 'Note', 'Tweetable', function ($scope, Note, Tweetable){
+    $scope.notes = Note.query();
+    // Note.all()
+    // .success(function(data){
+    //     $scope.notes = data;
+    // });
+    $scope.tweetThatNote = function(noteToTweet) {
+        Tweetable(noteToTweet)
+        .success(function(status){
+          console.log(status);
+        });
+      };
+}]);
