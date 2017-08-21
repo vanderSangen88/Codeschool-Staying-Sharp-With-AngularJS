@@ -1,10 +1,13 @@
 <div class="users-wrapper">
     <h1>Users</h1>
-    <a class="card-users" ng-repeat="user in users">
-        <nw-card header="user.name" 
-                description="user.bio"
-                id="user.id"
-                image="gravatarUrl(user.email)">
-        </nw-card>
-    </a>
+
+    <div class="users-wrapper">
+        <a class="card-users" ng-repeat="user in users">
+            <nw-card header="user.name" 
+                    description="user.bio"
+                    id="user.id"
+                    image="gravatarUrl(user.email)">
+            </nw-card>
+        </a>
+    </div>
 </div>

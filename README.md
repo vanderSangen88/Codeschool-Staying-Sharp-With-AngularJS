@@ -644,5 +644,17 @@ scope: {
   </a>
   ...
 ```
+#### Searching with a wildcard
+*in notes.index.html*
+```html
+<input ng-model="search.$" />
+```
 
-*in index.*
+## 4.10 External Library Directive
+
+#### Creating a Directive for 3rd-Party Plugins
+
+TO.BE.Added.
+
+#### When to Use Controller/Link
+Inside directives, it is best practice to use controller only when you want to share functions with other directives - and use the require property. All other times you should use link.
