@@ -441,3 +441,154 @@ To create a new resource ```$scope.note = new Note(); note.$save()```.
   });
 ...
 ```
+
+---
+## Reusable Directives Level 4
+
+### 4.1 Helping Child and Parent Communicate
+
+#### Creating a Category Select Directive
+*in index.html*
+```html
+<nw-category-select></nw-category-select>
+```
+*in new nw-category-select.js*
+```js
+angular.module("NoteWrangler")
+.directive("nwCategorySelect", ['$scope', function($scope, Category){
+    return {
+        replace: true,
+        restrict: "E",
+        templateUrl: "/templates/directives/nw-category-select.html"
+    };
+});
+```
+
+#### Retrieving a List of Categories
+*in nw-category-select.js*
+```js
+...
+link: function(scope, element, attrs){ // Data access should be done from the link function
+  scope.categories = Category.query();
+}
+...
+```
+
+#### Mocking Up Templates
+*in new nw-category-select.html*
+```html
+<div class="sort-menu">
+  <h2>Categories</h2>
+  <div class="card">
+    <!-- Child Select Items Go Here -->
+    <nw-category-item
+      ng-repeat="category in categories"
+      category="category">
+    </nw-category-item>
+  </div>
+</div>
+```
+
+*in new nw-category-item.html*
+```html
+<a class="sort-menu-item">
+  <i class="icon left {{category.icon}}"></i>
+  {{category.name}} {{category.Count()}}
+</a>
+```
+
+#### Creating Our Inner Child directive
+*in new nw-category-item.js*
+```js
+angular.module("NoteWrangler")
+.directive("nwCategoryItem", function() {
+  return {
+    restrict: "E",
+    templateUrl: "/templates/directives/nw-category-item.html",
+    scope: {
+      category: "="
+    }
+  };
+});
+```
+#### Where to Keep Track of Active Category
+In nwCategorySelect, manage the activeCategory and allow the inner nwCategoryItems to get or set the active value when they need to.
+
+#### Defining Our setActiveCategory function
+*in nw-category-select.js*
+```js
+...
+  controller: function($scope){
+    this.setActiveCategory = function(category) {
+      $scope.activeCategory = category.name;
+    }
+  }
+...
+```
+
+#### Inner categoryItems Need Parent's Method
+Have each child require their parent's directive.
+*in nw-category-item.js*
+```js
+...
+  require: "^nwCategorySelect"
+...
+```
+
+#### Adding Link's 4th Parameter; the parent's controller.
+*in nw-category-item.js*
+```js
+...
+  link: function(scope, element, attrs, nwCategorySelectCtrl){
+    scope.makeActive = function(){
+      nwCategorySelectCtrl.setActiveCategory(scope.category);
+    }
+  }
+...
+```
+
+#### Calling makeActive with ngClick
+*in nw-category-item.html*
+```html
+<a
+  class="sort-menu-item"
+  ng-click="makeActive()">
+    ...
+</a>
+```
+
+#### Creating categoryActive()
+*in nw-category-select.js*
+```js
+...
+  controller: function($scope){
+    this.getActiveCategory = function() {
+        return $scope.activeCategory;
+    }
+    ...
+    return this;
+  }
+...
+```
+
+#### Creating a Method to Toggle Active styles
+*in nw-category-item.js*
+```js
+...
+link: function(scope, element, attrs, nwCategorySelectCtrl){
+  ...
+  scope.categoryActive = function() {
+    return nwCategorySelectCtrl.getActiveCategory() === scope.category.name;
+  }
+}
+...
+```
+
+*in nw-category-item.html*
+```html
+<a
+  ...
+  ng-class="'active': categoryActive()">
+    ...
+</a>
+```
