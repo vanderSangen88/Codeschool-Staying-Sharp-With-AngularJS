@@ -10,11 +10,14 @@ angular.module("NoteWrangler")
         controller: function($scope) {
             this.getActiveCategory = function(){
                 return $scope.activeCategory;
-            }
+            };
             this.setActiveCategory = function(category){
                 $scope.activeCategory = category.name;
-            }
+            };
             return this;
+        },
+        scope: {
+            activeCategory: "="
         }
     };
 }]);

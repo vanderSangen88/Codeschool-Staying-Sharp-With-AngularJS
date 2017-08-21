@@ -592,3 +592,57 @@ link: function(scope, element, attrs, nwCategorySelectCtrl){
     ...
 </a>
 ```
+
+### 4.2 Using a Filter to Finish the Job
+
+#### The filter Filter
+Will take a large array and filter down that array and return you back a smaller one of just a subset items you were looking for.
+The filter method takes a string, object or function:
+```
+{{ ["Alyssa", "Nicoll", "loves", "Angular", "to", "pieces"] | filter : "a" }}
+```
+and returns:
+```
+["Alyssa", "Angular"]
+```
+
+#### Using filter to Sort Notes
+*in notes/index.html*
+```html
+...
+<a ...
+  ng-repeat="note in notes | filter: {category: {name: activeCategory}}">
+    ...
+</a>
+...
+```
+
+Two-way bind it to the nw-category-select:
+*in index.html*
+```html
+<nw-category-select active-category="activeCategory"></nw-category-select>
+```
+
+*in nw-category-select.js*
+```js
+...
+scope: {
+    activeCategory: "="
+}
+...
+```
+
+#### Searching with filter Filter
+*in notes/index.html*
+```html
+<input ng-model="search.title" />
+...
+<div class="note-wrapper">
+  <a ...
+    ng-repeat="note in notes | filter: search">
+      ...
+  </a>
+  ...
+```
+
+*in index.*
